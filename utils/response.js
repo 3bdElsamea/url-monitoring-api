@@ -10,3 +10,9 @@ exports.notFound = (res, message = "") => {
     message,
   });
 };
+
+exports.deleteResponse = (res, message = "") => {
+  res.json({
+    message,
+  });
+};

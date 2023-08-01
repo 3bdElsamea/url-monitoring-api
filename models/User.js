@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Please Enter your name"],
+      minlength: [3, "Name must be at least 3 characters"],
     },
     email: {
       type: String,
@@ -44,6 +45,14 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
+
+// pre for find by id and update to hash password
+userSchema.pre("findOneAndUpdate", async function (next) {
+  if (!this._update.password) return next();
+  this._update.password = await bcrypt.hash(this._update.password, 12);
+  next();
+});
+
 // After save user send email verification token
 
 // User Static Method to authenticate user by email and password

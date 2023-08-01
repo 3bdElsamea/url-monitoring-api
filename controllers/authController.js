@@ -43,7 +43,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   if (!user.isVerified) throw new AppError("Please verify your email", 401);
 
-  // If everything is ok, send token to client
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION,
   });
@@ -89,12 +88,12 @@ exports.myProfile = catchAsync(async (req, res, next) => {
 });
 
 exports.updateProfile = catchAsync(async (req, res, next) => {
-  const updatedUser = User.findByIdAndUpdate(req.user._id, req.body, {
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
     new: true,
-    runValidators: true,
   });
+  console.log(updatedUser);
 
-  success(res, 200, { user: updatedUser });
+  success(res, 200, { updatedUser });
 });
 
 // These routes are for testing purposes only and should be removed in production

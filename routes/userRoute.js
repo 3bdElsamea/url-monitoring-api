@@ -8,6 +8,7 @@ const {
   verifyEmail,
   resendEmailVerification,
   myProfile,
+  updateProfile,
   getAllUsers,
 } = require("../controllers/authController");
 
@@ -22,6 +23,6 @@ router.get("/users", getAllUsers); // for testing purposes only and should be re
 
 router.use(authMW);
 
-router.get("/me", myProfile);
+router.route("/me").get(myProfile).patch(updateProfile);
 
 module.exports = router;
