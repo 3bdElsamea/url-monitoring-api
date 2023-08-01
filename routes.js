@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 const errorHandler = require("./controllers/errorController");
 const userRouter = require("./routes/userRoute");
 const checkRouter = require("./routes/checkRoute");
+const reportRouter = require("./routes/reportRoutes");
 const AppError = require("./utils/appError");
 
 const router = express.Router();
@@ -22,6 +23,9 @@ router.use("/api/auth", userRouter);
 
 // Check routes
 router.use("/api/checks", checkRouter);
+
+// Report routes
+router.use("/api/reports", reportRouter);
 
 // catch not found routes
 router.all("*", (req, res, next) => {

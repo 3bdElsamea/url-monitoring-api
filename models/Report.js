@@ -47,7 +47,21 @@ const reportSchema = new mongoose.Schema({
     default: 0,
   },
   responseTime: {
-    type: String,
+    type: Number,
     default: 0,
   },
+  history: {
+    type: [historySchema],
+    default: [],
+  },
 });
+
+reportSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "check",
+    select: "name url protocol",
+  });
+  next();
+});
+
+module.exports = mongoose.model("Report", reportSchema);

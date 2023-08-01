@@ -39,85 +39,108 @@ const assertSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const checkSchema = new mongoose.Schema({
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: [true, "Check must belong to a user"],
+const checkSchema = new mongoose.Schema(
+  {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Check must belong to a user"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please Enter your name"],
+      minlength: [3, "Name must be at least 3 characters"],
+    },
+    url: {
+      type: String,
+      required: [true, "You must provide a url"],
+    },
+    protocol: {
+      type: String,
+      enum: ["HTTP", "HTTPS", "TCP"],
+      default: "HTTPS",
+    },
+    path: {
+      type: String,
+      default: "",
+    },
+    port: {
+      type: Number,
+      default: 443,
+    },
+    webhook: {
+      type: String,
+      default: "",
+    },
+    timeout: {
+      type: Number,
+      default: 5000, // 5 seconds default
+    },
+    interval: {
+      type: Number,
+      default: 600000, // 10 minutes default
+    },
+    threshold: {
+      type: Number,
+      default: 1,
+    },
+    authentication: {
+      type: authenticationSchema,
+      required: false,
+    },
+    httpHeaders: {
+      type: [httpHeadersSchema],
+      required: false,
+    },
+    assert: {
+      type: assertSchema,
+      required: false,
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
+    ignoreSSL: {
+      type: Boolean,
+      default: false,
+    },
   },
-  name: {
-    type: String,
-    required: [true, "Please Enter your name"],
-    minlength: [3, "Name must be at least 3 characters"],
-  },
-  url: {
-    type: String,
-    required: [true, "You must provide a url"],
-  },
-  protocol: {
-    type: String,
-    enum: ["HTTP", "HTTPS", "TCP"],
-    default: "HTTPS",
-  },
-  path: {
-    type: String,
-    default: "",
-  },
-  port: {
-    type: Number,
-    default: 443,
-  },
-  webhook: {
-    type: String,
-    default: "",
-  },
-  timeout: {
-    type: Number,
-    default: 5000, // 5 seconds default
-  },
-  interval: {
-    type: Number,
-    default: 600000, // 10 minutes default
-  },
-  threshold: {
-    type: Number,
-    default: 1,
-  },
-  authentication: {
-    type: authenticationSchema,
-    required: false,
-  },
-  httpHeaders: {
-    type: [httpHeadersSchema],
-    required: false,
-  },
-  assert: {
-    type: assertSchema,
-    required: false,
-  },
-  tags: {
-    type: [String],
-    default: [],
-  },
-  ignoreSSL: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 // static method to check if the user has a check with the same name and url
-checkSchema.statics.checkExists = async function (name, url = null, owner) {
-  const checkExists = await this.findOne({
-    name,
-    url,
-    owner,
-  });
-  if (checkExists)
-    throw new AppError(
-      "Check with the name and url already exists in your checks",
-      400
-    );
+checkSchema.statics = {
+  checkExists: async function (name, url = null, owner) {
+    const checkExists = await this.findOne({
+      name,
+      url,
+      owner,
+    });
+    if (checkExists)
+      throw new AppError(
+        "Check with the name and url already exists in your checks",
+        400
+      );
 
-  return true;
+    return true;
+  },
+  //   Check Exists
+  checkExistsById: async function (id, owner) {
+    const check = await this.findOne({ _id: id, owner });
+    if (!check) throw new AppError("Check not found", 404);
+    return check;
+  },
+  //     Get Check by tags
+  getChecksByTags: async function (tags, owner) {
+    const checks = await this.find({
+      tags: { $in: tags },
+      owner,
+    });
+    if (checks.length === 0)
+      throw new AppError("No checks found with the given tags", 404);
+    return checks;
+  },
 };
 checkSchema.pre("save", async function (next) {
   await this.constructor.checkExists(this.name, this.url, this.owner);
