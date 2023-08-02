@@ -1,8 +1,8 @@
 const Check = require("../models/Check");
 const Report = require("../models/Report");
-const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { success, deleteResponse } = require("../utils/response");
+const cronJob = require("../services/cronService");
 
 exports.getAllUserChecks = catchAsync(async (req, res, next) => {
   const checks = await Check.getOwnerChecks(req.user._id);
@@ -21,6 +21,7 @@ exports.getUserCheck = catchAsync(async (req, res, next) => {
 exports.createUserCheck = catchAsync(async (req, res) => {
   const check = await Check.create({ ...req.body, owner: req.user._id });
   await check.createReport();
+  await cronJob.scheduleTask(check);
   success(res, 201, {
     data: { message: "Check created successfully with its report", check },
   });

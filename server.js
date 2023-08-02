@@ -12,6 +12,7 @@ mongoose
   .connect(process.env.DB_URL)
   .then(() => {
     console.log("Database connected successfully");
+
     // Start server
     app.listen(port, () => {
       console.log(`Server started on port ${port}`);

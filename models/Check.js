@@ -75,7 +75,9 @@ const checkSchema = new mongoose.Schema(
     },
     timeout: {
       type: Number,
-      default: 5, // 5 seconds default
+      default: 5000, // 5 seconds default
+      min: [2000, "Timeout must be at least 2 seconds"],
+      max: [30000, "Timeout must be at most 30 seconds"],
     },
     interval: {
       type: Number,
