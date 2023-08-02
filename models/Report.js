@@ -1,4 +1,9 @@
 const mongoose = require("mongoose");
+const Email = require("../services/mailService");
+const Check = require("./Check");
+const User = require("./User");
+const AppError = require("../utils/AppError");
+
 const historySchema = new mongoose.Schema(
   {
     status: {
@@ -59,9 +64,17 @@ const reportSchema = new mongoose.Schema({
 reportSchema.pre(/^find/, function (next) {
   this.populate({
     path: "check",
-    select: "owner name url path",
+    select: "owner name url path timeout interval threshold",
   });
   next();
 });
+reportSchema.methods = {
+  //  Send email to user when status is changed
+  async sendStatusEmail() {
+    console.log(this.check.url);
+    const user = await User.findById(this.check.owner);
+    await new Email(user).sendStatusChangeEmail(this.status, this.check.name);
+  },
+};
 
 module.exports = mongoose.model("Report", reportSchema);

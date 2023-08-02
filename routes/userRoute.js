@@ -9,7 +9,6 @@ const {
   resendEmailVerification,
   myProfile,
   updateProfile,
-  getAllUsers,
 } = require("../controllers/authController");
 const {
   validateSignUp,
@@ -28,8 +27,6 @@ router.post(
   validateResendVerificationEmail,
   resendEmailVerification
 );
-
-router.get("/users", getAllUsers); // for testing purposes only and should be removed
 
 router.use(authMW);
 

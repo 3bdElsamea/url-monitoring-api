@@ -38,4 +38,11 @@ module.exports = class Email {
       `This is your email verification token: ${token}`
     );
   }
+
+  async sendStatusChangeEmail(status, checkedUrl) {
+    await this.send(
+      "Status Change",
+      `Your check status for ${checkedUrl} has been changed to ${status}`
+    );
+  }
 };

@@ -86,9 +86,3 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 
   success(res, 200, { updatedUser });
 });
-
-// These routes are for testing purposes only and should be removed in production
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-  success(res, 200, { users });
-});
