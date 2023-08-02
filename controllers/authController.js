@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const randomString = require("randomstring");
 
 const User = require("../models/User");
 const AppError = require("../utils/appError");
@@ -7,13 +6,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { success } = require("../utils/response");
 const Email = require("../services/mailService");
-
-const createVerificationToken = () => {
-  return randomString.generate({
-    length: 16,
-    charset: "alphanumeric",
-  });
-};
+const createVerificationToken = require("../utils/createVerificationToken");
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -69,8 +62,8 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
 exports.resendEmailVerification = catchAsync(async (req, res, next) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) throw new AppError("User not found", 404);
+  const user = await User.findOne({ email, isVerified: false });
+  if (!user) throw new AppError("User not found or is already verified", 404);
 
   user.emailVerificationToken = createVerificationToken();
   user.emailVerificationTokenExpires = Date.now() + 10 * 60 * 1000;
@@ -83,7 +76,6 @@ exports.resendEmailVerification = catchAsync(async (req, res, next) => {
 
 exports.myProfile = catchAsync(async (req, res, next) => {
   const user = req.user;
-  console.log(user);
   success(res, 200, { user });
 });
 
@@ -91,7 +83,6 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
     new: true,
   });
-  console.log(updatedUser);
 
   success(res, 200, { updatedUser });
 });

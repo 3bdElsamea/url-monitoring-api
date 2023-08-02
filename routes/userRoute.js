@@ -11,18 +11,28 @@ const {
   updateProfile,
   getAllUsers,
 } = require("../controllers/authController");
+const {
+  validateSignUp,
+  validateLogin,
+  validateResendVerificationEmail,
+  validateUpdateProfile,
+} = require("../validation/userValidation");
 
 const router = express.Router();
 
-router.post("/signup", signup);
-router.post("/login", login);
+router.post("/signup", validateSignUp, signup);
+router.post("/login", validateLogin, login);
 router.get("/verify-email/:token", verifyEmail);
-router.post("/resend-email-verification", resendEmailVerification);
+router.post(
+  "/resend-email-verification",
+  validateResendVerificationEmail,
+  resendEmailVerification
+);
 
 router.get("/users", getAllUsers); // for testing purposes only and should be removed
 
 router.use(authMW);
 
-router.route("/me").get(myProfile).patch(updateProfile);
+router.route("/me").get(myProfile).patch(validateUpdateProfile, updateProfile);
 
 module.exports = router;

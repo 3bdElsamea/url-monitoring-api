@@ -7,13 +7,14 @@ const {
   getAllUserReports,
 } = require("../controllers/reportController");
 
+const { validateReportByTags } = require("../validation/reportValidation");
 const router = express.Router();
 
 router.use(authMW);
 
 router.route("/").get(getAllUserReports);
 
-router.route("/tags").post(groupReportsByTags);
+router.route("/tags").post(validateReportByTags, groupReportsByTags);
 
 router.route("/:checkId").get(getReportByCheckId);
 

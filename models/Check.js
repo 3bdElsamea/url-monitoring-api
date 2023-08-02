@@ -75,11 +75,13 @@ const checkSchema = new mongoose.Schema(
     },
     timeout: {
       type: Number,
-      default: 5000, // 5 seconds default
+      default: 5, // 5 seconds default
     },
     interval: {
       type: Number,
-      default: 600000, // 10 minutes default
+      default: 10, // 10 minutes default
+      min: [3, "Interval must be at least 3 minute"],
+      max: [59, "Interval must be at most 59 minutes"],
     },
     threshold: {
       type: Number,
@@ -160,11 +162,5 @@ checkSchema.post("save", async function (doc, next) {
   await Report.create({ check: doc._id, status: "up" });
   next();
 });
-
-// checkSchema.post("deleteOne", async function (doc, next) {
-//   console.log("hello from post delete", doc);
-//   await Report.deleteMany({ check: doc._id });
-//   next();
-// });
 
 module.exports = mongoose.model("Check", checkSchema);
