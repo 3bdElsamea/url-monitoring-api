@@ -34,7 +34,7 @@ const createCheckSchema = joi.object({
 
 const updateCheckSchema = joi.object({
   name: joi.string().min(3),
-  url: joi.string().trim(),
+  // url: joi.string().trim(),
   protocol: joi.string().valid("HTTP", "HTTPS", "TCP"),
   path: joi.string().trim(),
   port: joi.number(),

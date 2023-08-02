@@ -27,7 +27,7 @@ const reportSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["up", "down"],
-    required: true,
+    default: "up",
   },
   availability: {
     type: Number,

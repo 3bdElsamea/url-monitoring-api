@@ -112,7 +112,7 @@ const checkSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-// static method to check if the user has a check with the same name and url
+// static methods
 checkSchema.statics = {
   checkExists: async function (name, url = null, owner) {
     const checkExists = await this.findOne({
@@ -152,14 +152,16 @@ checkSchema.statics = {
     return checks;
   },
 };
+
+// Instance methods
+checkSchema.methods = {
+  //     create report
+  createReport: async function () {
+    await Report.create({ check: this._id });
+  },
+};
 checkSchema.pre("save", async function (next) {
   await this.constructor.checkExists(this.name, this.url, this.owner);
-  next();
-});
-
-// after saving the check, we need to create a report for it
-checkSchema.post("save", async function (doc, next) {
-  await Report.create({ check: doc._id, status: "up" });
   next();
 });
 

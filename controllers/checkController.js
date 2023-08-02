@@ -20,7 +20,10 @@ exports.getUserCheck = catchAsync(async (req, res, next) => {
 
 exports.createUserCheck = catchAsync(async (req, res) => {
   const check = await Check.create({ ...req.body, owner: req.user._id });
-  success(res, 201, { check });
+  await check.createReport();
+  success(res, 201, {
+    data: { message: "Check created successfully with its report", check },
+  });
 });
 
 exports.updateUserCheck = catchAsync(async (req, res) => {
