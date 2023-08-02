@@ -59,7 +59,7 @@ const reportSchema = new mongoose.Schema({
 reportSchema.pre(/^find/, function (next) {
   this.populate({
     path: "check",
-    select: "name url protocol",
+    select: "owner name url path",
   });
   next();
 });

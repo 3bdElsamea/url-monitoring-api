@@ -1,25 +1,11 @@
 const Check = require("../models/Check");
+const Report = require("../models/Report");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { success, deleteResponse } = require("../utils/response");
 
-/*Helper Functions*/
-// const checkExists = async (id, owner) => {
-//   const checkExists = await Check.findOne({
-//     _id: id,
-//     owner,
-//   });
-//   if (!checkExists) throw new AppError("No check found with that ID", 404);
-//
-//   console.log("From the function", checkExists);
-//
-//   return checkExists;
-// };
-
-/*End Of helper Functions*/
-
 exports.getAllUserChecks = catchAsync(async (req, res, next) => {
-  const checks = await Check.find({ owner: req.user._id });
+  const checks = await Check.getOwnerChecks(req.user._id);
 
   success(res, 200, {
     total: checks.length,
@@ -49,9 +35,12 @@ exports.updateUserCheck = catchAsync(async (req, res) => {
 });
 
 exports.deleteUserCheck = catchAsync(async (req, res, next) => {
-  const checkToDelete = await checkExists(req.params.id, req.user._id);
-  // use deleteOne instead of remove
+  const checkToDelete = await Check.checkExistsById(
+    req.params.id,
+    req.user._id
+  );
   await checkToDelete.deleteOne();
+  await Report.deleteOne({ check: checkToDelete._id });
 
-  deleteResponse(res, "Check deleted successfully");
+  deleteResponse(res, "The Check and its Report have been deleted");
 });

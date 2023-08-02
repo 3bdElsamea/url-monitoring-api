@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Report = require("./Report");
 const AppError = require("../utils/AppError");
 
 const authenticationSchema = new mongoose.Schema(
@@ -125,7 +126,14 @@ checkSchema.statics = {
 
     return true;
   },
-  //   Check Exists
+  //   get owner checks
+  getOwnerChecks: async function (owner) {
+    const checks = await this.find({ owner });
+    if (checks.length === 0)
+      throw new AppError("No checks found for the authenticated user", 404);
+    return checks;
+  },
+  //   Check By Id and  Owner
   checkExistsById: async function (id, owner) {
     const check = await this.findOne({ _id: id, owner });
     if (!check) throw new AppError("Check not found", 404);
@@ -146,5 +154,17 @@ checkSchema.pre("save", async function (next) {
   await this.constructor.checkExists(this.name, this.url, this.owner);
   next();
 });
+
+// after saving the check, we need to create a report for it
+checkSchema.post("save", async function (doc, next) {
+  await Report.create({ check: doc._id, status: "up" });
+  next();
+});
+
+// checkSchema.post("deleteOne", async function (doc, next) {
+//   console.log("hello from post delete", doc);
+//   await Report.deleteMany({ check: doc._id });
+//   next();
+// });
 
 module.exports = mongoose.model("Check", checkSchema);
