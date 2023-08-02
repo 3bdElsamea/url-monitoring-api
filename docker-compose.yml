@@ -8,7 +8,6 @@ services:
       - "3000:3000"
     volumes:
       - .:/app
-    command: npm run dev
     depends_on:
       - mongo
   #  Mongodb service
