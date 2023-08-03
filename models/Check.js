@@ -82,7 +82,7 @@ const checkSchema = new mongoose.Schema(
     interval: {
       type: Number,
       default: 10, // 10 minutes default
-      min: [3, "Interval must be at least 3 minute"],
+      min: [1, "Interval must be at least 1 minute"],
       max: [59, "Interval must be at most 59 minutes"],
     },
     threshold: {

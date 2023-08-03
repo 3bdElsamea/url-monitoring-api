@@ -11,6 +11,7 @@ class UptimeReportJob {
   }
 
   async successfulRequest(report, responseTime, interval) {
+    console.log("Successful request");
     const statusChanged = report.status;
     let uptime = report.uptime + interval;
     report.availability = (uptime / (uptime + report.downtime)) * 100; // calculate availability percentage
@@ -28,6 +29,7 @@ class UptimeReportJob {
   }
 
   async failedRequest(report, responseTime, interval) {
+    console.log("Failed request");
     const statusChanged = report.status;
     report.outages++;
     report.downtime = report.downtime + interval;
@@ -46,25 +48,25 @@ class UptimeReportJob {
   // This is the method that will be called by the cron job to check the status of the url
   async checkAvailability(check) {
     const startTime = Date.now();
-    const report = await Report.findOne({ check: check._id });
-    console.log(report._doc);
+    const report = await Report.findOne({ check: check._id }).populate(
+      "history"
+    );
     const client = axios.create({
       baseURL: `${check.protocol}://${check.url}:${check.port}`,
       auth: check.authentication,
       timeout: check.timeout,
       headers: check.headers,
     });
-    console.log(`${check.protocol}://${check.url}:${check.port}`);
     axiosRetry(client, { retries: check.threshold });
     try {
-      console.log("Checking availability");
       const response = await client.get(check.path, {
         allowRedirects: false,
+        maxRedirects: 0,
       });
-      // console.log("Response: ", response.status);
-      // console.log("Location: ", response.headers);
       const responseTime = Date.now() - startTime;
-      report.responseTime = (report.responseTime + responseTime) / 2;
+      report.responseTime =
+        (report.responseTime * report.history.length + responseTime) /
+        (report.history.length + 1);
       if (
         (check.assert && response.status !== check.assert.statusCode) ||
         (!check.assert && response.status >= 400)
@@ -78,9 +80,14 @@ class UptimeReportJob {
 
       // if the response throws an error
     } catch (err) {
-      // console.log("Error: ", err.response.status);
       console.log("Error: ", err);
-      await this.failedRequest(report, check.timeout, check.interval);
+      //   if the error is a redirect error with status starts with 3 call the successful request method
+      const responseTime = Date.now() - startTime;
+      if (err.response && err.response.status.toString().startsWith("3")) {
+        await this.successfulRequest(report, responseTime, check.interval);
+      } else {
+        await this.failedRequest(report, responseTime, check.interval);
+      }
     }
   }
 
@@ -88,17 +95,17 @@ class UptimeReportJob {
   async scheduleTask(check) {
     console.log(`Scheduling task for ${check.name}`);
     const task = cron.schedule(
-      `*/1 * * * *`,
+      `*/${check.interval} * * * *`,
       async () => await this.checkAvailability(check)
     );
     this.tasks[check._id] = task;
     await task.start();
   }
 
-  // run the jobs when the server starts
+  // run the jobs when the server restarts
   async runJobs() {
     const checks = await Check.find();
-    checks.map(async (check) => {
+    checks?.map(async (check) => {
       await this.scheduleTask(check);
     });
   }
