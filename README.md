@@ -86,4 +86,14 @@ docker-compose -f docker-compose.yml up
 
 # Postman Workspace Documentation
 
-[![Visit the Wotkspace](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/19175846-9b9e3952-a8d1-4b75-b353-add680985ace?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D19175846-9b9e3952-a8d1-4b75-b353-add680985ace%26entityType%3Dcollection%26workspaceId%3Dfad3576a-7f8e-4523-8da3-ee4241e0d192)
+## User Authentication
+
+[![User Authentication](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/25931255/2s9Xxwxa49)
+
+## Url Checks
+
+[![Url Checks](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/25931255/2s9Xxwxa4B)
+
+## Reports
+
+[![Reports](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/25931255/2s9Xxwxa4E)

@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const router = require("./routes");
 const app = express();
 
-config();
+config({ path: "./.env" });
 
 // Middlewares
 app.use(cors());
