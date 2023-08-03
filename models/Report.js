@@ -4,6 +4,11 @@ const User = require("./User");
 
 const historySchema = new mongoose.Schema(
   {
+    report_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Report",
+      required: [true, "History must belong to a report"],
+    },
     status: {
       type: String,
       enum: ["up", "down"],
@@ -19,46 +24,54 @@ const historySchema = new mongoose.Schema(
     timestamps: {
       updatedAt: false,
     },
-    _id: false,
   }
 );
-const reportSchema = new mongoose.Schema({
-  check: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Check",
-    required: [true, "Report must belong to a check"],
+const reportSchema = new mongoose.Schema(
+  {
+    check: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Check",
+      required: [true, "Report must belong to a check"],
+    },
+    status: {
+      type: String,
+      enum: ["up", "down", "not checked"],
+      default: "not checked",
+    },
+    availability: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    outages: {
+      type: Number,
+      default: 0,
+    },
+    downtime: {
+      type: Number,
+      default: 0,
+    },
+    uptime: {
+      type: Number,
+      default: 0,
+    },
+    // Average response time
+    responseTime: {
+      type: Number,
+      default: 0,
+    },
   },
-  status: {
-    type: String,
-    enum: ["up", "down"],
-    default: "up",
-  },
-  availability: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  outages: {
-    type: Number,
-    default: 0,
-  },
-  downtime: {
-    type: Number,
-    default: 0,
-  },
-  uptime: {
-    type: Number,
-    default: 0,
-  },
-  // Average response time
-  responseTime: {
-    type: Number,
-    default: 0,
-  },
-  history: {
-    type: [historySchema],
-    default: [],
-  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+// virtual history field to get all history of a report
+reportSchema.virtual("history", {
+  ref: "History",
+  foreignField: "report_id",
+  localField: "_id",
 });
 
 reportSchema.pre(/^find/, function (next) {
@@ -68,8 +81,8 @@ reportSchema.pre(/^find/, function (next) {
   });
   next();
 });
+
 reportSchema.methods = {
-  //  Send email to user when status is changed
   async sendStatusEmail() {
     console.log(this.check.url);
     const user = await User.findById(this.check.owner);
@@ -77,4 +90,7 @@ reportSchema.methods = {
   },
 };
 
-module.exports = mongoose.model("Report", reportSchema);
+const History = mongoose.model("History", historySchema);
+const Report = mongoose.model("Report", reportSchema);
+
+module.exports = { Report, History };

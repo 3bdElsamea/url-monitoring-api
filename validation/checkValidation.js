@@ -18,7 +18,7 @@ const assertSchema = joi.object({
 const createCheckSchema = joi.object({
   name: joi.string().min(3).required(),
   url: joi.string().required(),
-  protocol: joi.string().valid("HTTP", "HTTPS", "TCP").default("HTTPS"),
+  protocol: joi.string().valid("http", "https", "tcp").default("https"),
   path: joi.string().trim().default(""),
   port: joi.number().default(443),
   webhook: joi.string().trim().default(""),
@@ -35,7 +35,7 @@ const createCheckSchema = joi.object({
 const updateCheckSchema = joi.object({
   name: joi.string().min(3),
   // url: joi.string().trim(),
-  protocol: joi.string().valid("HTTP", "HTTPS", "TCP"),
+  protocol: joi.string().valid("http", "https", "tcp"),
   path: joi.string().trim(),
   port: joi.number(),
   webhook: joi.string().trim(),

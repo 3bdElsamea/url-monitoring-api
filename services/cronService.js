@@ -2,7 +2,7 @@ const cron = require("node-cron");
 const axios = require("axios");
 const axiosRetry = require("axios-retry");
 
-const Report = require("../models/Report");
+const { Report, History } = require("../models/Report");
 const Check = require("../models/Check");
 
 class UptimeReportJob {
@@ -11,33 +11,35 @@ class UptimeReportJob {
   }
 
   async successfulRequest(report, responseTime, interval) {
-    const statusChanged = report.status !== "up";
+    const statusChanged = report.status;
     let uptime = report.uptime + interval;
     report.availability = (uptime / (uptime + report.downtime)) * 100; // calculate availability percentage
     report.uptime = uptime;
     report.status = "up";
-    report.history.push({
+    await History.create({
+      report_id: report._id,
       status: "up",
       responseTime,
     });
     await report.save();
-    if (statusChanged) {
-      await report.sendStatusChangeEmail();
+    if (statusChanged === "down") {
+      await report.sendStatusEmail();
     }
   }
 
   async failedRequest(report, responseTime, interval) {
-    const statusChanged = report.status !== "down";
+    const statusChanged = report.status;
     report.outages++;
     report.downtime = report.downtime + interval;
     report.status = "down";
-    report.history.push({
+    await History.create({
+      report_id: report._id,
       status: "down",
       responseTime,
     });
     await report.save();
-    if (statusChanged) {
-      await report.sendStatusChangeEmail();
+    if (statusChanged === "up") {
+      await report.sendStatusEmail();
     }
   }
 
@@ -45,20 +47,24 @@ class UptimeReportJob {
   async checkAvailability(check) {
     const startTime = Date.now();
     const report = await Report.findOne({ check: check._id });
+    console.log(report._doc);
     const client = axios.create({
       baseURL: `${check.protocol}://${check.url}:${check.port}`,
       auth: check.authentication,
       timeout: check.timeout,
+      headers: check.headers,
     });
+    console.log(`${check.protocol}://${check.url}:${check.port}`);
     axiosRetry(client, { retries: check.threshold });
     try {
-      const response = await client.get(check.path);
-      const responsesCount = report.history.length;
+      console.log("Checking availability");
+      const response = await client.get(check.path, {
+        allowRedirects: false,
+      });
+      // console.log("Response: ", response.status);
+      // console.log("Location: ", response.headers);
       const responseTime = Date.now() - startTime;
-      report.responseTime =
-        (report.responseTime * responsesCount + responseTime) /
-        (responsesCount + 1);
-      // if the report has assertions or the response status code is failed with code starts with 4 or 5
+      report.responseTime = (report.responseTime + responseTime) / 2;
       if (
         (check.assert && response.status !== check.assert.statusCode) ||
         (!check.assert && response.status >= 400)
@@ -72,6 +78,8 @@ class UptimeReportJob {
 
       // if the response throws an error
     } catch (err) {
+      // console.log("Error: ", err.response.status);
+      console.log("Error: ", err);
       await this.failedRequest(report, check.timeout, check.interval);
     }
   }
@@ -80,7 +88,7 @@ class UptimeReportJob {
   async scheduleTask(check) {
     console.log(`Scheduling task for ${check.name}`);
     const task = cron.schedule(
-      `*/${check.interval} * * * * *`,
+      `*/1 * * * *`,
       async () => await this.checkAvailability(check)
     );
     this.tasks[check._id] = task;
@@ -90,7 +98,6 @@ class UptimeReportJob {
   // run the jobs when the server starts
   async runJobs() {
     const checks = await Check.find();
-    //   map through the checks and schedule a task for each check
     checks.map(async (check) => {
       await this.scheduleTask(check);
     });

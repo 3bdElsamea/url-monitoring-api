@@ -1,4 +1,4 @@
-const Report = require("../models/Report");
+const { Report } = require("../models/Report");
 const Check = require("../models/Check");
 
 const AppError = require("../utils/appError");
@@ -19,7 +19,7 @@ exports.getAllUserReports = catchAsync(async (req, res, next) => {
 
 exports.getReportByCheckId = catchAsync(async (req, res, next) => {
   const check = await Check.checkExistsById(req.params.checkId, req.user._id);
-  const report = await Report.findOne({ check: check._id });
+  const report = await Report.findOne({ check: check._id }).populate("history");
   if (!report) throw new AppError("No report found for that check", 404);
 
   success(res, 200, { report });

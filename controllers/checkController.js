@@ -1,5 +1,5 @@
 const Check = require("../models/Check");
-const Report = require("../models/Report");
+const { Report } = require("../models/Report");
 const catchAsync = require("../utils/catchAsync");
 const { success, deleteResponse } = require("../utils/response");
 const cronJob = require("../services/cronService");

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Report = require("./Report");
+const { Report } = require("./Report");
 const AppError = require("../utils/AppError");
 
 const authenticationSchema = new mongoose.Schema(
@@ -58,8 +58,8 @@ const checkSchema = new mongoose.Schema(
     },
     protocol: {
       type: String,
-      enum: ["HTTP", "HTTPS", "TCP"],
-      default: "HTTPS",
+      enum: ["http", "https", "tcp"],
+      default: "https",
     },
     path: {
       type: String,
