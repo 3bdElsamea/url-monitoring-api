@@ -69,9 +69,9 @@ npm run dev
 
 ## Running the Docker image
 
-1. Download the repo
-2. Go to the project directory
-3. Run the following command in the terminal:
+- Download the repo
+- Go to the project directory
+- Run the following command in the terminal:
 
 ```
 docker-compose -f docker-compose.yml up
@@ -101,3 +101,5 @@ docker-compose -f docker-compose.yml up
 - **GET /api/reports**: Get all uptime reports for the authenticated user.
 - **POST /api/reports/tags**: Group uptime reports by url check tags for the authenticated user.
 - **GET /api/reports/:checkId**: Get uptime report for a specific URL check.
+
+# Postman Workspace Documentation
