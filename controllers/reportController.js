@@ -33,7 +33,7 @@ exports.groupReportsByTags = catchAsync(async (req, res, next) => {
 
   const reports = await Report.find({
     check: { $in: checksId },
-  }).populate("check");
+  }).populate("history");
   if (reports.length === 0)
     throw new AppError("No reports for Checks with that tag", 404);
 
