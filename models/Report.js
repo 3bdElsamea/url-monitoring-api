@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const Email = require("../services/mailService");
-const Check = require("./Check");
 const User = require("./User");
-const AppError = require("../utils/AppError");
 
 const historySchema = new mongoose.Schema(
   {
@@ -11,6 +9,7 @@ const historySchema = new mongoose.Schema(
       enum: ["up", "down"],
       required: true,
     },
+    // Response time for each check request
     responseTime: {
       type: Number,
       required: true,
@@ -51,6 +50,7 @@ const reportSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  // Average response time
   responseTime: {
     type: Number,
     default: 0,

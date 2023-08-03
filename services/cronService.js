@@ -50,6 +50,7 @@ class UptimeReportJob {
       auth: check.authentication,
       timeout: check.timeout,
     });
+    axiosRetry(client, { retries: check.threshold });
     try {
       const response = await client.get(check.path);
       const responsesCount = report.history.length;

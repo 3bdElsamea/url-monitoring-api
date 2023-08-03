@@ -11,5 +11,4 @@ COPY . .
 #Expose port 3000
 EXPOSE 3000
 #Run the app
-#CMD ["npm", "start"]
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
