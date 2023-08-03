@@ -8,7 +8,9 @@ const { success } = require("../utils/response");
 exports.getAllUserReports = catchAsync(async (req, res, next) => {
   const checks = await Check.getOwnerChecks(req.user._id);
   const checksId = checks.map((check) => check._id);
-  const reports = await Report.find({ check: { $in: checksId } });
+  const reports = await Report.find({ check: { $in: checksId } }).populate(
+    "history"
+  );
   if (reports.length === 0)
     return next(
       new AppError("No reports found for the authenticated user", 404)
@@ -31,7 +33,7 @@ exports.groupReportsByTags = catchAsync(async (req, res, next) => {
 
   const reports = await Report.find({
     check: { $in: checksId },
-  });
+  }).populate("check");
   if (reports.length === 0)
     throw new AppError("No reports for Checks with that tag", 404);
 
