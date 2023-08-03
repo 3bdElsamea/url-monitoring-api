@@ -19,27 +19,9 @@ uptime reports about their availability, average response time, and total uptime
 
 ### To run this project locally on your machine:
 
-### Add the following environment variables to your .env file:
+### ```Fill the environment variables in the .env.example file```
 
-**Server Config**
-
-- PORT : The port number on which the server will listen.
-- NODE_ENV : The environment in which the server is running (development, production).
-
-**Database Config**
-
-- DB_URL : The URL or connection string for the database.
-
-**Token Config**
-
-- JWT_SECRET : The secret key used to sign authentication tokens.
-- JWT_EXPIRATION : The expiration duration for authentication tokens.
-
-**Email Config**
-
-- SENDGRID_USERNAME : The username of your SendGrid integration.
-- SENDGRID_PASSWORD : The password of your SendGrid integration.
-- EMAIL_FROM : The authenticated SendGrid email that sends the mail.
+### ```and rename it to .env ```
 
 ### Clone the project:
 
@@ -103,3 +85,5 @@ docker-compose -f docker-compose.yml up
 - **GET /api/reports/:checkId**: Get uptime report for a specific URL check.
 
 # Postman Workspace Documentation
+
+[![Visit the Wotkspace](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/19175846-9b9e3952-a8d1-4b75-b353-add680985ace?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D19175846-9b9e3952-a8d1-4b75-b353-add680985ace%26entityType%3Dcollection%26workspaceId%3Dfad3576a-7f8e-4523-8da3-ee4241e0d192)
