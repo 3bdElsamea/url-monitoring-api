@@ -78,3 +78,26 @@ docker-compose -f docker-compose.yml up
 ```
 
 # API Documentation
+
+## User Routes
+
+- **POST /api/auth/signup** : Sign up with email verification.
+- **POST /api/auth/login** : Login with credentials to obtain authentication token.
+- **GET /api/auth/verify-email/:token** : Verify email using the verification token.
+- **POST /api/auth/resend-email-verification** : Resend email verification link.
+- **GET /api/auth/me** : Get the authenticated user's Profile details.
+- **PATCH /api/auth/me** : Update the authenticated user's Profile details.
+
+## Url Checks Routes
+
+- **GET /api/checks**: Get all URL checks for the authenticated user.
+- **POST /api/checks**: Create a new URL check for the authenticated user.
+- **GET /api/checks/:id**: Get details of a specific URL check.
+- **PATCH /api/checks/:id**: Update a specific URL check for the authenticated user.
+- **DELETE /api/checks/:id**: Delete a specific URL check for the authenticated user.
+
+## Report Routes
+
+- **GET /api/reports**: Get all uptime reports for the authenticated user.
+- **POST /api/reports/tags**: Group uptime reports by url check tags for the authenticated user.
+- **GET /api/reports/:checkId**: Get uptime report for a specific URL check.
