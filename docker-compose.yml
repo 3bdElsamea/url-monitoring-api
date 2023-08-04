@@ -1,4 +1,4 @@
-ءversion: "3"
+version: "3"
 services:
   app:
     build:
