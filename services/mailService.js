@@ -9,17 +9,17 @@ module.exports = class Email {
   newTransport() {
     // sendgrid
     return Mailer.createTransport({
-      service: "SendGrid",
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       auth: {
-        user: process.env.SENDGRID_USERNAME,
-        pass: process.env.SENDGRID_PASSWORD,
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
   }
 
-  // send method for sending emails just sending the message not html
+  // send method for sending emails
   async send(subject, message) {
-    // 1) Define email options
     const mailOptions = {
       from: this.from,
       to: this.to,
@@ -27,7 +27,6 @@ module.exports = class Email {
       text: message,
     };
 
-    // 2) Create a transport and send email
     await this.newTransport().sendMail(mailOptions);
   }
 
@@ -39,6 +38,7 @@ module.exports = class Email {
     );
   }
 
+  // Send Email to user when his check status is changed
   async sendStatusChangeEmail(status, checkedUrl) {
     await this.send(
       "Status Change",
