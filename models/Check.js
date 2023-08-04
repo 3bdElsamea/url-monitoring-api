@@ -157,7 +157,6 @@ checkSchema.statics = {
 
 // Instance methods
 checkSchema.methods = {
-  //     create report
   createReport: async function () {
     await Report.create({ check: this._id });
   },

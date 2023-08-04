@@ -53,8 +53,6 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   next();
 });
 
-// After save user send email verification token
-
 // User Static Method to authenticate user by email and password
 userSchema.statics = {
   authenticate: async function (email, password) {
@@ -70,7 +68,6 @@ userSchema.statics = {
 
 // User Instance Methods
 userSchema.methods = {
-  // Generate Email Verification Token
   createEmailVerificationToken: function () {
     //   Create random alphanumeric token
     const verificationToken = randomString.generate({

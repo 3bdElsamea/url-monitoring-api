@@ -7,7 +7,6 @@ module.exports = class Email {
   }
 
   newTransport() {
-    // sendgrid
     return Mailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
