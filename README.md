@@ -56,7 +56,7 @@ npm run dev
 - Run the following command in the terminal:
 
 ```
-docker-compose -f docker-compose.yml up
+docker-compose up --build
 ```
 
 # API Documentation
