@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Report } = require("./Report");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError");
 
 const authenticationSchema = new mongoose.Schema(
   {
@@ -122,19 +122,14 @@ checkSchema.statics = {
       url,
       owner,
     });
-    if (checkExists)
-      throw new AppError(
-        "Check with the name and url already exists in your checks",
-        400
-      );
+    if (checkExists) throw new AppError("Check with the name and url already exists in your checks", 400);
 
     return true;
   },
   //   get owner checks
   getOwnerChecks: async function (owner) {
     const checks = await this.find({ owner });
-    if (checks.length === 0)
-      throw new AppError("No checks found for the authenticated user", 404);
+    if (checks.length === 0) throw new AppError("No checks found for the authenticated user", 404);
     return checks;
   },
   //   Check By Id and  Owner
@@ -149,8 +144,7 @@ checkSchema.statics = {
       tags: { $in: tags },
       owner,
     });
-    if (checks.length === 0)
-      throw new AppError("No checks found with the given tags", 404);
+    if (checks.length === 0) throw new AppError("No checks found with the given tags", 404);
     return checks;
   },
 };

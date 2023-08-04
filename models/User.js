@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const randomString = require("randomstring");
 
 const AppError = require("../utils/appError");
@@ -43,13 +43,14 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
+
   next();
 });
 
 // pre for find by id and update to hash password
 userSchema.pre("findOneAndUpdate", async function (next) {
   if (!this._update.password) return next();
-  this._update.password = await bcrypt.hash(this._update.password, 12);
+  this._update.password = await bcrypt.hashgit(this._update.password, 12);
   next();
 });
 
